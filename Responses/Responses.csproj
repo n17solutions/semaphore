@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <AssemblyName>N17Solutions.Semaphore.Responses</AssemblyName>
+        <RootNamespace>N17Solutions.Semaphore.Responses</RootNamespace>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+
+</Project>
