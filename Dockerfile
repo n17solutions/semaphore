@@ -1,17 +1,13 @@
-FROM microsoft/dotnet:sdk AS build
+FROM microsoft/dotnet:sdk
 
-WORKDIR /code
+# SET ASP.NET Core environment variables
+ENV ASPNETCORE_ENVIRONMENT="Production"
 
-COPY . .
+# Copy files to app directory
+COPY /release /app
 
-RUN dotnet restore
-RUN dotnet test --no-restore
-RUN dotnet publish ./API/API.csproj --output /output --configuration Release
-
-FROM microsoft/dotnet:aspnetcore-runtime
-
-COPY --from=build /output /app
-
+# Set working directory
 WORKDIR /app
 
+# Run
 ENTRYPOINT ["dotnet", "N17Solutions.Semaphore.API.dll"]
