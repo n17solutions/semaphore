@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore;
+﻿using System;
+using System.IO;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
 namespace N17Solutions.Semaphore.API
@@ -7,6 +9,8 @@ namespace N17Solutions.Semaphore.API
     {
         public static void Main(string[] args)
         {
+            Console.WriteLine($"Directory Exists: {Directory.Exists("/data/semaphore")}");
+            Console.WriteLine($"Public Key Exists: {File.Exists("/data/semaphore/public.key")}");
             CreateWebHostBuilder(args).Build().Run();
         }
 

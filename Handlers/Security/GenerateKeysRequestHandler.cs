@@ -12,6 +12,7 @@ namespace N17Solutions.Semaphore.Handlers.Security
 {
     public class GenerateKeysRequestHandler : RequestHandler<GenerateKeysRequest, byte[]>
     {
+        public const string DataFolderName = "/data/semaphore";
         public const string PublicKeyFileName = "public.key";
 
         protected override byte[] Handle(GenerateKeysRequest request)
@@ -25,7 +26,8 @@ namespace N17Solutions.Semaphore.Handlers.Security
             var publicKeyInfo = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(keys.Public);
 
             var publicKey = publicKeyInfo.ToAsn1Object().GetDerEncoded();
-            using (var fileStream = File.Create(PublicKeyFileName))
+
+            using (var fileStream = File.Create(request.PublicKeyPath))
                 fileStream.Write(publicKey, 0, publicKey.Length);
 
             return privateKeyInfo.ToAsn1Object().GetDerEncoded();

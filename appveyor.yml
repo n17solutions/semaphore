@@ -32,7 +32,7 @@ build_script:
   - cmd: dotnet build --no-restore
 deploy:
   release: v$(appveyor_build_version)
-  description: '{version}'
+  description: 'See RELEASE_NOTES.md for more information.'
   provider: GitHub
   auth_token: 
     secure: pmrOSWJmxWC7kMbFK39zyTmJ3F3Vl9aX3nwExv+lTFcNdSyyMELuQkzoA0xIj2qc
@@ -43,10 +43,3 @@ environment:
     secure: pmrOSWJmxWC7kMbFK39zyTmJ3F3Vl9aX3nwExv+lTFcNdSyyMELuQkzoA0xIj2qc
   git_email:
     secure: 5EodxtRa6w7UZeb3SQhOIWhkaWTx6mIZ0S1TDe2Mp64=
-#on_success:
-#  - git config --global credential.helper store
-#  - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
-#  - git config --global user.email "$($env:git_email)"
-#  - git config --global user.name "James Woodley"
-#  - git tag v$(version)
-#  - git push --tags
