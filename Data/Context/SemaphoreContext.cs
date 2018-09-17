@@ -13,6 +13,7 @@ namespace N17Solutions.Semaphore.Data.Context
     public class SemaphoreContext : DbContext
     {
         #region Aggregate Roots
+        public DbSet<Setting> Settings { get; set; }
         public DbSet<Feature> Features { get; set; }
         public DbSet<Signal> Signals { get; set; }
         #endregion

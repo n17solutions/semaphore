@@ -1,5 +1,10 @@
-using System.IO;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using N17Solutions.Semaphore.Data.Context;
+using N17Solutions.Semaphore.Domain.Model;
 using N17Solutions.Semaphore.Requests.Security;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
@@ -10,12 +15,20 @@ using Org.BouncyCastle.X509;
 
 namespace N17Solutions.Semaphore.Handlers.Security
 {
-    public class GenerateKeysRequestHandler : RequestHandler<GenerateKeysRequest, byte[]>
+    public class GenerateKeysRequestHandler : IRequestHandler<GenerateKeysRequest, byte[]>
     {
-        public const string DataFolderName = "/data/semaphore";
-        public const string PublicKeyFileName = "public.key";
+        public const string PublicKeySettingName = "PublicKey";
 
-        protected override byte[] Handle(GenerateKeysRequest request)
+        private readonly SemaphoreContext _context;
+        private readonly IMediator _mediator;
+
+        public GenerateKeysRequestHandler(SemaphoreContext context, IMediator mediator)
+        {
+            _context = context;
+            _mediator = mediator;
+        }
+
+        public async Task<byte[]> Handle(GenerateKeysRequest request, CancellationToken cancellationToken)
         {
             var rsaKeyPairGenerator = new RsaKeyPairGenerator();
             var randomGenerator = new CryptoApiRandomGenerator();
@@ -26,11 +39,26 @@ namespace N17Solutions.Semaphore.Handlers.Security
             var publicKeyInfo = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(keys.Public);
 
             var publicKey = publicKeyInfo.ToAsn1Object().GetDerEncoded();
+            var value = Convert.ToBase64String(publicKey);
 
-            using (var fileStream = File.Create(request.PublicKeyPath))
-                fileStream.Write(publicKey, 0, publicKey.Length);
+            var setting = await _context.Settings.FirstOrDefaultAsync(s => s.Name.Equals(PublicKeySettingName, StringComparison.InvariantCultureIgnoreCase), cancellationToken).ConfigureAwait(false);
+            if (setting == null)
+            {
+                setting = new Setting
+                {
+                    Name = PublicKeySettingName,
+                    Value = value
+                };
+                await _context.Settings.AddAsync(setting, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                setting.Value = value;
+            }
 
-            return privateKeyInfo.ToAsn1Object().GetDerEncoded();   
+            await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+            return privateKeyInfo.ToAsn1Object().GetDerEncoded();
         }
     }
 }

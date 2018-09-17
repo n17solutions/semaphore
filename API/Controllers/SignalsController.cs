@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using N17Solutions.Semaphore.Handlers.Security;
+using N17Solutions.Semaphore.Requests.Settings;
 using N17Solutions.Semaphore.Requests.Signals;
 
 namespace N17Solutions.Semaphore.API.Controllers
@@ -22,7 +23,11 @@ namespace N17Solutions.Semaphore.API.Controllers
             var privateKey = Request.Headers["private-key"];
             if (!string.IsNullOrEmpty(privateKey))
             {
-                if (!System.IO.File.Exists(GenerateKeysRequestHandler.PublicKeyFileName))
+                var publicKey = await _mediator.Send(new GetSettingRequest
+                {
+                    Name = GenerateKeysRequestHandler.PublicKeySettingName
+                });
+                if (publicKey == null)
                     return StatusCode(500, "No Public Key found.");
             }
             

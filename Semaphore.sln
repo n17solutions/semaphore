@@ -21,7 +21,6 @@ ProjectSection(SolutionItems) = preProject
 	Dockerfile = Dockerfile
 	appveyor.yml = appveyor.yml
 	RELEASE_NOTES.md = RELEASE_NOTES.md
-	kubernetes.tmpl = kubernetes.tmpl
 	README.md = README.md
 EndProjectSection
 EndProject

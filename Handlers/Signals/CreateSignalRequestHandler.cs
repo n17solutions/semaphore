@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +7,7 @@ using N17Solutions.Semaphore.Data.Context;
 using N17Solutions.Semaphore.Domain.Model;
 using N17Solutions.Semaphore.Handlers.Security;
 using N17Solutions.Semaphore.Requests.Security;
+using N17Solutions.Semaphore.Requests.Settings;
 using N17Solutions.Semaphore.Requests.Signals;
 
 namespace N17Solutions.Semaphore.Handlers.Signals
@@ -32,10 +31,14 @@ namespace N17Solutions.Semaphore.Handlers.Signals
             var value = request.Value;
             if (request.Encrypted)
             {
-                var publicKey = File.ReadAllBytes(GenerateKeysRequestHandler.PublicKeyFileName);
+                var publicKey = await _mediator.Send(new GetSettingRequest
+                {
+                    Name = GenerateKeysRequestHandler.PublicKeySettingName
+                }, cancellationToken).ConfigureAwait(false);
+                
                 value = await _mediator.Send(new EncryptionRequest
                 {
-                    PublicKey = publicKey,
+                    PublicKey = Convert.FromBase64String(publicKey),
                     ToEncrypt = value
                 }, cancellationToken).ConfigureAwait(false);
                 

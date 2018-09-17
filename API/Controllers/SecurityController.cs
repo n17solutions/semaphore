@@ -1,9 +1,9 @@
-using System.IO;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using N17Solutions.Semaphore.Handlers.Security;
 using N17Solutions.Semaphore.Requests.Security;
+using N17Solutions.Semaphore.Requests.Settings;
 
 namespace N17Solutions.Semaphore.API.Controllers
 {
@@ -25,18 +25,15 @@ namespace N17Solutions.Semaphore.API.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(bool force = false)
         {
-            var dataDirectoryExists = Directory.Exists(GenerateKeysRequestHandler.DataFolderName);
-            var publicKeyPath = dataDirectoryExists
-                ? Path.Combine(GenerateKeysRequestHandler.DataFolderName, GenerateKeysRequestHandler.PublicKeyFileName)
-                : GenerateKeysRequestHandler.PublicKeyFileName;
+            var publicKey = await _mediator.Send(new GetSettingRequest
+            {
+                Name = GenerateKeysRequestHandler.PublicKeySettingName
+            });
 
-            if (!force && System.IO.File.Exists(publicKeyPath))
+            if (!force && publicKey != null)
                 return Ok("Public Key exists already.");
 
-            var result = await _mediator.Send(new GenerateKeysRequest
-            {
-                PublicKeyPath = publicKeyPath
-            });
+            var result = await _mediator.Send(new GenerateKeysRequest());
             return Ok(result);
         }
     }

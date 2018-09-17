@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using N17Solutions.Semaphore.Data.Context;
+using N17Solutions.Semaphore.Domain.Model;
 using N17Solutions.Semaphore.Handlers.Security;
 using N17Solutions.Semaphore.Handlers.Signals;
 using N17Solutions.Semaphore.Requests.Security;
@@ -57,9 +57,11 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
         public async Task Should_Create_New_Encrypted_Signal()
         {
             // Arrange
-            var publicKey = Encoding.UTF8.GetBytes("Test Public Key");
-            using (var fileStream = File.Create(GenerateKeysRequestHandler.PublicKeyFileName))
-                fileStream.Write(publicKey, 0, publicKey.Length);
+            await _context.Settings.AddAsync(new Setting
+            {
+                Name = GenerateKeysRequestHandler.PublicKeySettingName,
+                Value = "Test Public Key"
+            }).ConfigureAwait(false);
             var request = new CreateSignalRequest
             {
                 Value = "Test Signal",
@@ -74,13 +76,11 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             result.ShouldNotBeNull();
             var signal = await _context.Signals.FirstOrDefaultAsync(s => s.ResourceId == result).ConfigureAwait(false);
             signal.ShouldNotBeNull();
-            signal.Value.ShouldNotBe(request.Value);
+            signal.Value.ShouldNotBeNull(request.Value);
         }
 
         public void Dispose()
         {
-            File.Delete(GenerateKeysRequestHandler.PublicKeyFileName);
-            
             _context.Database.EnsureDeleted();
             _context.Dispose();
         }
