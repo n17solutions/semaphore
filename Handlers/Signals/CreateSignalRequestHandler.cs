@@ -50,7 +50,7 @@ namespace N17Solutions.Semaphore.Handlers.Signals
             {
                 ResourceId = RT.Comb.Provider.PostgreSql.Create(),
                 Name = request.Name,
-                Tags = string.Join(",", request.Tags),
+                Tags = string.Join(",", tags),
                 Value = value
             };
 

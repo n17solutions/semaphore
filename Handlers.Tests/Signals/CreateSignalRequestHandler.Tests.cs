@@ -10,6 +10,7 @@ using N17Solutions.Semaphore.Domain.Model;
 using N17Solutions.Semaphore.Handlers.Security;
 using N17Solutions.Semaphore.Handlers.Signals;
 using N17Solutions.Semaphore.Requests.Security;
+using N17Solutions.Semaphore.Requests.Settings;
 using N17Solutions.Semaphore.Requests.Signals;
 using Shouldly;
 using Xunit;
@@ -19,6 +20,7 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
     public class CreateSignalRequestHandlerTests : IDisposable
     {
         private readonly SemaphoreContext _context;
+        private readonly Mock<IMediator> _mediatorMock = new Mock<IMediator>();
         private readonly CreateSignalRequestHandler _sut;
 
         public CreateSignalRequestHandlerTests()
@@ -28,11 +30,7 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
                 .Options;
             _context = new SemaphoreContext(dbOptions);
 
-            var mediatorMock = new Mock<IMediator>();
-            mediatorMock.Setup(x => x.Send(It.IsAny<EncryptionRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync((EncryptionRequest request, CancellationToken token) 
-                => Convert.ToBase64String(Encoding.UTF8.GetBytes(request.ToEncrypt)));
-            
-            _sut = new CreateSignalRequestHandler(_context, mediatorMock.Object);
+            _sut = new CreateSignalRequestHandler(_context, _mediatorMock.Object);
         }
 
         [Fact]
@@ -57,11 +55,10 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
         public async Task Should_Create_New_Encrypted_Signal()
         {
             // Arrange
-            await _context.Settings.AddAsync(new Setting
-            {
-                Name = GenerateKeysRequestHandler.PublicKeySettingName,
-                Value = "Test Public Key"
-            }).ConfigureAwait(false);
+            _mediatorMock.Setup(x => x.Send(It.IsAny<EncryptionRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync((EncryptionRequest encryptionRequest, CancellationToken token) 
+                => Convert.ToBase64String(Encoding.UTF8.GetBytes(encryptionRequest.ToEncrypt)));
+            _mediatorMock.Setup(x => x.Send(It.IsAny<GetSettingRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(Convert.ToBase64String(Encoding.UTF8.GetBytes("Test Public Key")));
+            
             var request = new CreateSignalRequest
             {
                 Value = "Test Signal",
@@ -77,6 +74,7 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             var signal = await _context.Signals.FirstOrDefaultAsync(s => s.ResourceId == result).ConfigureAwait(false);
             signal.ShouldNotBeNull();
             signal.Value.ShouldNotBeNull(request.Value);
+            signal.Tags.ShouldContain(CreateSignalRequestHandler.EncryptedTag);
         }
 
         public void Dispose()
