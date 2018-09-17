@@ -16,21 +16,21 @@ spec:
       - name: n17solutions-semaphore
         image: n17solutions/semaphore
         volumeMounts:
-          - mountPath: /data/semaphore
-            name: semaphore-data-volume
-        ports:
-          - containerPort: 80
-            name: http
-          - containerPort: 443
-            name: https
-          env:
-            - name: SEMAPHORE_DB
-              value: "<DB_CONNECTION_STRING>"
-      volumes:
-        # The data volume is used to store the public key. Use any volume mechanism you like - example given here is emptyDir
-        # See the kubernetes documentation for more details (https://kubernetes.io/docs/concepts/storage/volumes/)
         - name: semaphore-data-volume
-          emptyDir: {}
+          mountPath: /data/semaphore
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        env:
+        - name: SEMAPHORE_DB
+          value: "Server=millhouse.dev-2876.aivencloud.com;Database=semaphore-pool;Port=14131;User Id=Semaphore;Password=onenrpyqzwthkuc7;SslMode=Require;Trust Server Certificate=true;Server Compatibility Mode=Redshift;Pooling=false;CommandTimeout=0"
+      volumes:
+      # The data volume is used to store the public key. Use any volume mechanism you like - example given here is emptyDir
+      # See the kubernetes documentation for more details (https://kubernetes.io/docs/concepts/storage/volumes/)
+      - name: semaphore-data-volume
+        emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -39,13 +39,13 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-      name: http
-    - protocol: TCP
-      port: 443
-      targetPort: 443
-      name: https
-    selector:
-      app: n17solutions-semaphore
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    name: http
+  - protocol: TCP
+    port: 443
+    targetPort: 443
+    name: https
+  selector:
+    app: n17solutions-semaphore

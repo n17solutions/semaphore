@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -13,6 +15,8 @@ namespace N17Solutions.Semaphore.Handlers.Signals
 {
     public class CreateSignalRequestHandler : IRequestHandler<CreateSignalRequest, Guid>
     {
+        public const string EncryptedTag = "encrypted";
+        
         private readonly SemaphoreContext _context;
         private readonly IMediator _mediator;
 
@@ -24,6 +28,7 @@ namespace N17Solutions.Semaphore.Handlers.Signals
 
         public async Task<Guid> Handle(CreateSignalRequest request, CancellationToken cancellationToken)
         {
+            var tags = request.Tags.ToList();
             var value = request.Value;
             if (request.Encrypted)
             {
@@ -33,6 +38,9 @@ namespace N17Solutions.Semaphore.Handlers.Signals
                     PublicKey = publicKey,
                     ToEncrypt = value
                 }, cancellationToken).ConfigureAwait(false);
+                
+                if (!tags.Contains(EncryptedTag))
+                    tags.Add(EncryptedTag);
             }
             
             var signal = new Signal

@@ -30,7 +30,7 @@ namespace N17Solutions.Semaphore.Handlers.Security
             using (var fileStream = File.Create(request.PublicKeyPath))
                 fileStream.Write(publicKey, 0, publicKey.Length);
 
-            return privateKeyInfo.ToAsn1Object().GetDerEncoded();
+            return privateKeyInfo.ToAsn1Object().GetDerEncoded();   
         }
     }
 }
