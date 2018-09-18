@@ -52,6 +52,23 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
         }
 
         [Fact]
+        public async Task Should_Create_New_Signal_With_No_Tags()
+        {
+            // Arrange
+            var request = new CreateSignalRequest
+            {
+                Value = "Test Signal"
+            };
+            
+            // Act
+            var result = await _sut.Handle(request, CancellationToken.None).ConfigureAwait(false);
+            
+            // Assert
+            result.ShouldNotBeNull();
+            (await _context.Signals.FirstOrDefaultAsync(signal => signal.ResourceId == result).ConfigureAwait(false)).ShouldNotBeNull();
+        }
+
+        [Fact]
         public async Task Should_Create_New_Encrypted_Signal()
         {
             // Arrange

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MediatR;
 
 namespace N17Solutions.Semaphore.Requests.Signals
@@ -15,15 +16,15 @@ namespace N17Solutions.Semaphore.Requests.Signals
         /// The value to set on this Signal.
         /// </summary>
         public string Value { get; set; }
-        
+
         /// <summary>
         /// A collection of tags to add to this signal.
         /// </summary>
-        public IEnumerable<string> Tags { get; set; }
+        public IEnumerable<string> Tags { get; set; } = Enumerable.Empty<string>();
 
         /// <summary>
         /// Whether to Encrypt the value
         /// </summary>
-        public bool Encrypted { get; set; } = false;
+        public bool Encrypted { get; set; }
     }
 }
