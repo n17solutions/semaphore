@@ -12,6 +12,7 @@ using N17Solutions.Semaphore.Handlers.Signals;
 using N17Solutions.Semaphore.Requests.Security;
 using N17Solutions.Semaphore.Requests.Settings;
 using N17Solutions.Semaphore.Requests.Signals;
+using N17Solutions.Semaphore.Responses.Signals;
 using Shouldly;
 using Xunit;
 
@@ -92,6 +93,43 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             signal.ShouldNotBeNull();
             signal.Value.ShouldNotBeNull(request.Value);
             signal.Tags.ShouldContain(CreateSignalRequestHandler.EncryptedTag);
+        }
+
+        [Fact]
+        public async Task Should_Throw_If_Already_Exists()
+        {
+            // Arrange
+            var signalResponse = new SignalResponse();
+            var request = new CreateSignalRequest
+            {
+                Value = "Test Signal"
+            };
+            _mediatorMock.Setup(x => x.Send(It.IsAny<GetSignalByNameRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(signalResponse);
+            
+            // Act
+            var result = await Should.ThrowAsync<InvalidOperationException>(_sut.Handle(request, CancellationToken.None)).ConfigureAwait(false);
+            
+            // Assert
+            result.Message.ShouldContain(CreateSignalRequestHandler.SignalAlreadyExistsErrorMessage);
+        }
+        
+        [Fact]
+        public async Task Should_Throw_If_Already_Exists_With_Tags()
+        {
+            // Arrange
+            var signalResponse = new SignalResponse();
+            var request = new CreateSignalRequest
+            {
+                Value = "Test Signal",
+                Tags = new []{"tag"}
+            };
+            _mediatorMock.Setup(x => x.Send(It.IsAny<GetSignalByNameAndTagRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(signalResponse);
+            
+            // Act
+            var result = await Should.ThrowAsync<InvalidOperationException>(_sut.Handle(request, CancellationToken.None)).ConfigureAwait(false);
+            
+            // Assert
+            result.Message.ShouldContain(CreateSignalRequestHandler.SignalAlreadyExistsErrorMessage);
         }
 
         public void Dispose()

@@ -15,6 +15,7 @@ namespace N17Solutions.Semaphore.Handlers.Signals
     public class CreateSignalRequestHandler : IRequestHandler<CreateSignalRequest, Guid>
     {
         public const string EncryptedTag = "encrypted";
+        public const string SignalAlreadyExistsErrorMessage = "Signal already exists.";
         
         private readonly SemaphoreContext _context;
         private readonly IMediator _mediator;
@@ -45,12 +46,28 @@ namespace N17Solutions.Semaphore.Handlers.Signals
                 if (!tags.Contains(EncryptedTag))
                     tags.Add(EncryptedTag);
             }
+
+            var joinedTags = string.Join(",", tags);
+            
+            // We check here to make sure we're not creating a duplicate
+            var duplicate = tags.Any()
+                ? await _mediator.Send(new GetSignalByNameAndTagRequest
+                {
+                    Name = request.Name,
+                    Tag = joinedTags
+                }, cancellationToken).ConfigureAwait(false)
+                : await _mediator.Send(new GetSignalByNameRequest
+                {
+                    Name = request.Name
+                }, cancellationToken).ConfigureAwait(false);
+            if (duplicate != null)
+                throw new InvalidOperationException(SignalAlreadyExistsErrorMessage);
             
             var signal = new Signal
             {
                 ResourceId = RT.Comb.Provider.PostgreSql.Create(),
                 Name = request.Name,
-                Tags = string.Join(",", tags),
+                Tags = joinedTags,
                 Value = value
             };
 

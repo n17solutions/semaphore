@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using N17Solutions.Semaphore.Handlers.Security;
 using N17Solutions.Semaphore.Requests.Settings;
 using N17Solutions.Semaphore.Requests.Signals;
+using N17Solutions.Semaphore.Responses.Signals;
 
 namespace N17Solutions.Semaphore.API.Controllers
 {
@@ -31,12 +32,20 @@ namespace N17Solutions.Semaphore.API.Controllers
                     return StatusCode(500, "No Public Key found.");
             }
             
-            var result = await _mediator.Send(new GetSignalByNameAndTagRequest
-            {
-                Name = name,
-                Tag = tag,
-                PrivateKey = privateKey
-            });
+            SignalResponse result;
+            if (string.IsNullOrEmpty(tag))
+                result = await _mediator.Send(new GetSignalByNameRequest
+                {
+                    Name = name,
+                    PrivateKey = privateKey
+                });
+            else
+                result = await _mediator.Send(new GetSignalByNameAndTagRequest
+                {
+                    Name = name,
+                    Tag = tag,
+                    PrivateKey = privateKey
+                });
             
             return Ok(result);
         }
