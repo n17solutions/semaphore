@@ -1,0 +1,43 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: semaphore-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: semaphore
+  template:
+    metadata:
+      labels:
+        app: semaphore
+    spec:
+      containers:
+      - name: semaphore
+        image: n17solutions/semaphore
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        env:
+        - name: SEMAPHORE_DB
+          value: "<SEMAPHORE_DB_CONNECTION_STRING>"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: semaphore-loadbalancer
+spec:
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    name: http
+  - protocol: TCP
+    port: 443
+    targetPort: 443
+    name: https
+  selector:
+    app: semaphore
