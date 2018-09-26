@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MediatR;
 using N17Solutions.Semaphore.Data.Context;
 using N17Solutions.Semaphore.Domain.Model;
+using N17Solutions.Semaphore.Handlers.Extensions;
 using N17Solutions.Semaphore.Handlers.Security;
 using N17Solutions.Semaphore.Requests.Security;
 using N17Solutions.Semaphore.Requests.Settings;
@@ -30,7 +31,11 @@ namespace N17Solutions.Semaphore.Handlers.Signals
         public async Task<Guid> Handle(CreateSignalRequest request, CancellationToken cancellationToken)
         {
             var tags = request.Tags.ToList();
-            var value = !(request.Value is string) ? JsonConvert.SerializeObject(request.Value) : request.Value.ToString();
+
+            var isBaseType = request.Value.IsBaseType();
+            var valueType = request.Value.GetSignalValueType();
+            var value = isBaseType ? request.Value.ToString() : JsonConvert.SerializeObject(request.Value);
+            
             if (request.Encrypted)
             {
                 var publicKey = await _mediator.Send(new GetSettingRequest
@@ -69,7 +74,9 @@ namespace N17Solutions.Semaphore.Handlers.Signals
                 ResourceId = RT.Comb.Provider.PostgreSql.Create(),
                 Name = request.Name,
                 Tags = joinedTags,
-                Value = value
+                Value = value,
+                ValueType = valueType,
+                IsBaseType = isBaseType
             };
 
             await _context.Signals.AddAsync(signal, cancellationToken).ConfigureAwait(false);

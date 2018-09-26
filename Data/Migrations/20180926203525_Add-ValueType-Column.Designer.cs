@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using N17Solutions.Semaphore.Data.Context;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -9,9 +10,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace N17Solutions.Semaphore.Data.Migrations
 {
     [DbContext(typeof(SemaphoreContext))]
-    partial class SemaphoreContextModelSnapshot : ModelSnapshot
+    [Migration("20180926203525_Add-ValueType-Column")]
+    partial class AddValueTypeColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,8 +63,6 @@ namespace N17Solutions.Semaphore.Data.Migrations
                     b.Property<DateTime>("DateLastUpdated");
 
                     b.Property<long?>("FeatureId");
-
-                    b.Property<bool>("IsBaseType");
 
                     b.Property<string>("Name");
 

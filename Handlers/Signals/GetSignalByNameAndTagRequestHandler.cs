@@ -9,6 +9,9 @@ using N17Solutions.Semaphore.Domain.Model;
 using N17Solutions.Semaphore.Requests.Security;
 using N17Solutions.Semaphore.Requests.Signals;
 using N17Solutions.Semaphore.Responses.Signals;
+using Newtonsoft.Json;
+
+// ReSharper disable InvertIf
 
 namespace N17Solutions.Semaphore.Handlers.Signals
 {
@@ -31,14 +34,21 @@ namespace N17Solutions.Semaphore.Handlers.Signals
                 .Select(SignalExpressions.ToSignalResponse)
                 .FirstOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false);
-
-            if (result != null && !string.IsNullOrEmpty(request.PrivateKey))
+           
+            if (result != null)
             {
-                result.Value = await _mediator.Send(new DecryptionRequest
+                if (!string.IsNullOrEmpty(request.PrivateKey))
                 {
-                    PrivateKey = request.PrivateKey,
-                    ToDecrypt = result.Value
-                }, cancellationToken).ConfigureAwait(false);
+                    result.Value = await _mediator.Send(new DecryptionRequest
+                    {
+                        PrivateKey = request.PrivateKey,
+                        ToDecrypt = result.Value.ToString()
+                    }, cancellationToken).ConfigureAwait(false);
+                }
+                
+                var valueType = Type.GetType(result.ValueType);
+                if (valueType != null)
+                    result.Value = result.IsBaseType ? Convert.ChangeType(result.Value, valueType) : JsonConvert.DeserializeObject(result.Value.ToString());
             }
 
             return result;

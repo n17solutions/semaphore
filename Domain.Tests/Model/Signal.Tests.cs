@@ -8,7 +8,7 @@ namespace N17Solutions.Semaphore.Domain.Tests.Model
     public class SignalTests
     {
         [Fact]
-        public void Should_Map_Signal_To_SignalResponse()
+        public void Should_Map_String_Signal_To_SignalResponse()
         {
             // Arrange
             var domainModel = new Signal
@@ -17,6 +17,8 @@ namespace N17Solutions.Semaphore.Domain.Tests.Model
                 ResourceId = Guid.NewGuid(),
                 Name = "Test Signal",
                 Value = "Test Value",
+                ValueType = typeof(object).FullName,
+                IsBaseType = false,
                 Tags = "Test,Tags",
                 DateCreated = DateTime.Now,
                 DateLastUpdated = DateTime.Now
@@ -29,8 +31,10 @@ namespace N17Solutions.Semaphore.Domain.Tests.Model
             result.ResourceId.ShouldBe(domainModel.ResourceId);
             result.Name.ShouldBe(domainModel.Name);
             result.Value.ShouldBe(domainModel.Value);
+            result.ValueType.ShouldBe(domainModel.ValueType);
+            result.IsBaseType.ShouldBe(domainModel.IsBaseType);
         }
-        
+
         [Fact]
         public void Should_Map_Signal_To_SignalResponse_When_ResourceId_Is_Null()
         {
@@ -40,6 +44,8 @@ namespace N17Solutions.Semaphore.Domain.Tests.Model
                 Id = 1,
                 Name = "Test Signal",
                 Value = "Test Value",
+                ValueType = typeof(string).FullName,
+                IsBaseType = true,
                 Tags = "Test,Tags",
                 DateCreated = DateTime.Now,
                 DateLastUpdated = DateTime.Now
@@ -52,6 +58,8 @@ namespace N17Solutions.Semaphore.Domain.Tests.Model
             result.ResourceId.ShouldBe(domainModel.ResourceId);
             result.Name.ShouldBe(domainModel.Name);
             result.Value.ShouldBe(domainModel.Value);
+            result.ValueType.ShouldBe(domainModel.ValueType);
+            result.IsBaseType.ShouldBe(domainModel.IsBaseType);
         }
     }
 }

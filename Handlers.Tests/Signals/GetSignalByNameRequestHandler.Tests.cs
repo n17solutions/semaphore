@@ -6,8 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using N17Solutions.Semaphore.Data.Context;
 using N17Solutions.Semaphore.Domain.Model;
+using N17Solutions.Semaphore.Handlers.Extensions;
 using N17Solutions.Semaphore.Handlers.Signals;
 using N17Solutions.Semaphore.Requests.Signals;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Shouldly;
 using Xunit;
 
@@ -15,6 +18,11 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
 {
     public class GetSignalByNameRequestHandlerTests : IDisposable
     {
+        private class TestObject
+        {
+            public object Value { get; set; }
+        }
+        
         private const string Name = "Test Signal";
         private const string Value = "Test Value";
         
@@ -37,6 +45,8 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
                 ResourceId = _resourceId,
                 Name = Name,
                 Value = Value,
+                ValueType = Value.GetSignalValueType(),
+                IsBaseType = Value.IsBaseType(),
                 DateCreated = DateTime.Now,
                 DateLastUpdated = DateTime.Now
             });
@@ -62,6 +72,39 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             result.ResourceId.ShouldBe(_resourceId);
             result.Name.ShouldBe(Name);
             result.Value.ShouldBe(Value);
+        }
+        
+        [Fact]
+        public async Task Should_Get_Object_Signal_By_Name_And_Tag()
+        {
+            // Arrange
+            var value = new TestObject { Value = Value };
+            
+            await _context.Signals.AddAsync(new Signal
+            {
+                Id = 2,
+                ResourceId = Guid.NewGuid(),
+                Name = $"{Name}_object",
+                Value = JsonConvert.SerializeObject(value),
+                ValueType = value.GetSignalValueType(),
+                IsBaseType = value.IsBaseType(),
+                DateCreated = DateTime.Now,
+                DateLastUpdated = DateTime.Now
+            }).ConfigureAwait(false);
+            await _context.SaveChangesAsync().ConfigureAwait(false);
+            
+            // Arrange
+            var request = new GetSignalByNameRequest
+            {
+                Name = $"{Name}_object"
+            };
+            
+            // Act
+            var result = await _sut.Handle(request, CancellationToken.None).ConfigureAwait(false);
+            
+            // Assert
+            result.ShouldNotBeNull();
+            result.Value.ShouldBeOfType<JObject>();
         }
 
         public void Dispose()
