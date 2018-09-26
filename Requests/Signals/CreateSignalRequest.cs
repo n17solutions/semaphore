@@ -15,7 +15,7 @@ namespace N17Solutions.Semaphore.Requests.Signals
         /// <summary>
         /// The value to set on this Signal.
         /// </summary>
-        public string Value { get; set; }
+        public object Value { get; set; }
 
         /// <summary>
         /// A collection of tags to add to this signal.

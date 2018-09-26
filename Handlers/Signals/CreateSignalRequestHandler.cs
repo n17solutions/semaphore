@@ -9,6 +9,7 @@ using N17Solutions.Semaphore.Handlers.Security;
 using N17Solutions.Semaphore.Requests.Security;
 using N17Solutions.Semaphore.Requests.Settings;
 using N17Solutions.Semaphore.Requests.Signals;
+using Newtonsoft.Json;
 
 namespace N17Solutions.Semaphore.Handlers.Signals
 {
@@ -29,7 +30,7 @@ namespace N17Solutions.Semaphore.Handlers.Signals
         public async Task<Guid> Handle(CreateSignalRequest request, CancellationToken cancellationToken)
         {
             var tags = request.Tags.ToList();
-            var value = request.Value;
+            var value = !(request.Value is string) ? JsonConvert.SerializeObject(request.Value) : request.Value.ToString();
             if (request.Encrypted)
             {
                 var publicKey = await _mediator.Send(new GetSettingRequest

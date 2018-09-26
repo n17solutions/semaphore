@@ -6,8 +6,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using N17Solutions.Semaphore.Data.Context;
-using N17Solutions.Semaphore.Domain.Model;
-using N17Solutions.Semaphore.Handlers.Security;
 using N17Solutions.Semaphore.Handlers.Signals;
 using N17Solutions.Semaphore.Requests.Security;
 using N17Solutions.Semaphore.Requests.Settings;
@@ -35,13 +33,34 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
         }
 
         [Fact]
-        public async Task Should_Create_New_Signal()
+        public async Task Should_Create_New_String_Signal()
         {
             // Arrange
             var request = new CreateSignalRequest
             {
                 Value = "Test Signal",
                 Tags = new[] {"Test", "Tags"}
+            };
+            
+            // Act
+            var result = await _sut.Handle(request, CancellationToken.None).ConfigureAwait(false);
+            
+            // Assert
+            result.ShouldNotBeNull();
+            (await _context.Signals.FirstOrDefaultAsync(signal => signal.ResourceId == result).ConfigureAwait(false)).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public async Task Should_Create_New_Object_Signal()
+        {
+            // Arrange
+            var request = new CreateSignalRequest
+            {
+                Value = new
+                {
+                    Property = "Property",
+                    Value = 1
+                }
             };
             
             // Act
@@ -91,7 +110,7 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             result.ShouldNotBeNull();
             var signal = await _context.Signals.FirstOrDefaultAsync(s => s.ResourceId == result).ConfigureAwait(false);
             signal.ShouldNotBeNull();
-            signal.Value.ShouldNotBeNull(request.Value);
+            signal.Value.ShouldNotBeNull();
             signal.Tags.ShouldContain(CreateSignalRequestHandler.EncryptedTag);
         }
 
