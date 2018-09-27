@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -9,6 +10,7 @@ using N17Solutions.Semaphore.Domain.Model;
 using N17Solutions.Semaphore.Handlers.Extensions;
 using N17Solutions.Semaphore.Handlers.Signals;
 using N17Solutions.Semaphore.Requests.Signals;
+using N17Solutions.Semaphore.ServiceContract;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Shouldly;
@@ -40,6 +42,13 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
                 .Options;
             _context = new SemaphoreContext(dbOptions);
 
+            _sut = new GetSignalByNameAndTagRequestHandler(_context, _mediatorMock.Object);
+        }
+
+        [Fact]
+        public async Task Should_Get_Signal_By_Name_And_Tag()
+        {
+            // Arrange
             _context.Signals.Add(new Signal
             {
                 Id = 1,
@@ -54,13 +63,6 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             });
             _context.SaveChanges();
             
-            _sut = new GetSignalByNameAndTagRequestHandler(_context, _mediatorMock.Object);
-        }
-
-        [Fact]
-        public async Task Should_Get_Signal_By_Name_And_Tag()
-        {
-            // Arrange
             var request = new GetSignalByNameAndTagRequest
             {
                 Name = Name,
@@ -97,7 +99,6 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             }).ConfigureAwait(false);
             await _context.SaveChangesAsync().ConfigureAwait(false);
             
-            // Arrange
             var request = new GetSignalByNameAndTagRequest
             {
                 Name = $"{Name}_object",
@@ -110,6 +111,39 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             // Assert
             result.ShouldNotBeNull();
             result.Value.ShouldBeOfType<JObject>();
+        }
+
+        [Fact]
+        public async Task Should_Get_Encrypted_Object_Signal_With_No_PrivateKey()
+        {
+            // Arrange
+            var value = new TestObject { Value = Value };
+            await _context.Signals.AddAsync(new Signal
+            {
+                Id = 3,
+                ResourceId = Guid.NewGuid(),
+                Name = $"{Name}_object_encrypted",
+                Value = Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value))),
+                ValueType = value.GetSignalValueType(),
+                IsBaseType = value.IsBaseType(),
+                Tags = $"{Tags},{Constants.EncryptedTag}",
+                DateCreated = DateTime.Now,
+                DateLastUpdated = DateTime.Now
+            }).ConfigureAwait(false);
+            await _context.SaveChangesAsync().ConfigureAwait(false);
+
+            var request = new GetSignalByNameAndTagRequest
+            {
+                Name = $"{Name}_object_encrypted",
+                Tag = "Test"
+            };
+            
+            // Act
+            var result = await _sut.Handle(request, CancellationToken.None).ConfigureAwait(false);
+            
+            // Assert
+            result.ShouldNotBeNull();
+            result.Value.ShouldBeOfType<string>();
         }
 
         public void Dispose()

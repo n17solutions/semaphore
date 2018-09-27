@@ -1,5 +1,6 @@
 using System;
 using N17Solutions.Semaphore.Domain.Model;
+using N17Solutions.Semaphore.ServiceContract;
 using Shouldly;
 using Xunit;
 
@@ -60,6 +61,33 @@ namespace N17Solutions.Semaphore.Domain.Tests.Model
             result.Value.ShouldBe(domainModel.Value);
             result.ValueType.ShouldBe(domainModel.ValueType);
             result.IsBaseType.ShouldBe(domainModel.IsBaseType);
+        }
+
+        [Theory]
+        [InlineData(Constants.EncryptedTag, true)]
+        [InlineData("SomeTag", false)]
+        [InlineData("", false)]
+        [InlineData(null, false)]
+        public void Should_Map_IsEncrypted_Properly_Based_On_Encrypted_Tag(string tags, bool expected)
+        {
+            // Arrange
+            var domainModel = new Signal
+            {
+                Id = 1,
+                Name = "Test Signal",
+                Value = "Test Value",
+                ValueType = typeof(string).FullName,
+                IsBaseType = true,
+                Tags = tags,
+                DateCreated = DateTime.Now,
+                DateLastUpdated = DateTime.Now
+            };
+            
+            // Act
+            var result = SignalExpressions.ToSignalResponse.Compile()(domainModel);
+            
+            // Assert
+            result.IsEncrypted.ShouldBe(expected);
         }
     }
 }

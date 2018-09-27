@@ -10,13 +10,13 @@ using N17Solutions.Semaphore.Handlers.Security;
 using N17Solutions.Semaphore.Requests.Security;
 using N17Solutions.Semaphore.Requests.Settings;
 using N17Solutions.Semaphore.Requests.Signals;
+using N17Solutions.Semaphore.ServiceContract;
 using Newtonsoft.Json;
 
 namespace N17Solutions.Semaphore.Handlers.Signals
 {
     public class CreateSignalRequestHandler : IRequestHandler<CreateSignalRequest, Guid>
     {
-        public const string EncryptedTag = "encrypted";
         public const string SignalAlreadyExistsErrorMessage = "Signal already exists.";
         
         private readonly SemaphoreContext _context;
@@ -49,8 +49,8 @@ namespace N17Solutions.Semaphore.Handlers.Signals
                     ToEncrypt = value
                 }, cancellationToken).ConfigureAwait(false);
                 
-                if (!tags.Contains(EncryptedTag))
-                    tags.Add(EncryptedTag);
+                if (!tags.Contains(Constants.EncryptedTag))
+                    tags.Add(Constants.EncryptedTag);
             }
 
             var joinedTags = string.Join(",", tags);

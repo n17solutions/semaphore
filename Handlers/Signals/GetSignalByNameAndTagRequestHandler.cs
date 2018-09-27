@@ -45,6 +45,8 @@ namespace N17Solutions.Semaphore.Handlers.Signals
                         ToDecrypt = result.Value.ToString()
                     }, cancellationToken).ConfigureAwait(false);
                 }
+                else if (result.IsEncrypted)
+                    return result;
                 
                 var valueType = Type.GetType(result.ValueType);
                 if (valueType != null)

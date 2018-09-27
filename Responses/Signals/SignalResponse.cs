@@ -23,6 +23,7 @@ namespace N17Solutions.Semaphore.Responses.Signals
         /// <summary>
         /// The type of the Signal's value
         /// </summary>
+        [JsonIgnore]
         public string ValueType { get; set; }
         
         /// <summary>
@@ -30,5 +31,11 @@ namespace N17Solutions.Semaphore.Responses.Signals
         /// </summary>
         [JsonIgnore]
         public bool IsBaseType { get; set; }
+        
+        /// <summary>
+        /// Denotes whether the Signal Value is encrypted.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsEncrypted { get; set; }
     }
 }

@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <AssemblyName>N17Solutions.Semaphore.ServiceContract</AssemblyName>
+        <RootNamespace>N17Solutions.Semaphore.ServiceContract</RootNamespace>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+
+</Project>

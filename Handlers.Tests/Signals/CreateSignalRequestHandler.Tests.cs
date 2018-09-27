@@ -11,6 +11,7 @@ using N17Solutions.Semaphore.Requests.Security;
 using N17Solutions.Semaphore.Requests.Settings;
 using N17Solutions.Semaphore.Requests.Signals;
 using N17Solutions.Semaphore.Responses.Signals;
+using N17Solutions.Semaphore.ServiceContract;
 using Shouldly;
 using Xunit;
 
@@ -111,7 +112,7 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             var signal = await _context.Signals.FirstOrDefaultAsync(s => s.ResourceId == result).ConfigureAwait(false);
             signal.ShouldNotBeNull();
             signal.Value.ShouldNotBeNull();
-            signal.Tags.ShouldContain(CreateSignalRequestHandler.EncryptedTag);
+            signal.Tags.ShouldContain(Constants.EncryptedTag);
         }
 
         [Fact]

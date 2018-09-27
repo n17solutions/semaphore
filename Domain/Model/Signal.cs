@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using N17Solutions.Semaphore.Responses.Signals;
+using N17Solutions.Semaphore.ServiceContract;
 
 namespace N17Solutions.Semaphore.Domain.Model
 {
@@ -58,7 +59,8 @@ namespace N17Solutions.Semaphore.Domain.Model
                     Name = domainModel.Name,
                     Value = domainModel.Value,
                     ValueType = domainModel.ValueType,
-                    IsBaseType = domainModel.IsBaseType
+                    IsBaseType = domainModel.IsBaseType,
+                    IsEncrypted = domainModel.Tags != null && domainModel.Tags.Contains(Constants.EncryptedTag)
                 };
     }
 }
