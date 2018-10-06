@@ -15,6 +15,7 @@ spec:
       containers:
       - name: semaphore
         image: n17solutions/semaphore
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
           name: http
