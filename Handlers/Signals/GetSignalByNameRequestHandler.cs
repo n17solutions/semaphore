@@ -36,7 +36,7 @@ namespace N17Solutions.Semaphore.Handlers.Signals
 
             if (result != null)
             {
-                if (!string.IsNullOrEmpty(request.PrivateKey))
+                if (!string.IsNullOrEmpty(request.PrivateKey) && result.IsEncrypted)
                 {
                     result.Value = await _mediator.Send(new DecryptionRequest
                     {
