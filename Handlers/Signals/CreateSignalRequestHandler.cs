@@ -11,6 +11,7 @@ using N17Solutions.Semaphore.Requests.Security;
 using N17Solutions.Semaphore.Requests.Settings;
 using N17Solutions.Semaphore.Requests.Signals;
 using N17Solutions.Semaphore.ServiceContract;
+using N17Solutions.Semaphore.ServiceContract.Extensions;
 using Newtonsoft.Json;
 
 namespace N17Solutions.Semaphore.Handlers.Signals

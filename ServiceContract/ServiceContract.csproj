@@ -7,4 +7,10 @@
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json">
+        <Version>11.0.2</Version>
+      </PackageReference>
+    </ItemGroup>
+
 </Project>

@@ -1,10 +1,13 @@
+using System;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using N17Solutions.Semaphore.Handlers.Security;
 using N17Solutions.Semaphore.Requests.Settings;
 using N17Solutions.Semaphore.Requests.Signals;
 using N17Solutions.Semaphore.Responses.Signals;
+using N17Solutions.Semaphore.ServiceContract.Signals;
 
 namespace N17Solutions.Semaphore.API.Controllers
 {
@@ -54,6 +57,23 @@ namespace N17Solutions.Semaphore.API.Controllers
         public async Task<IActionResult> Post([FromBody]CreateSignalRequest request)
         {
             await _mediator.Send(request);
+            return Ok();
+        }
+
+        [HttpPatch]
+        [Route("{signalId}")]
+        public async Task<IActionResult> Patch(Guid signalId, [FromBody] JsonPatchDocument<SignalWriteModel> request)
+        {
+            var patchSignalRequest = new PatchSignalRequest
+            {
+                Id = signalId,
+                Patch = request
+            };
+
+            if (!TryValidateModel(patchSignalRequest))
+                return BadRequest(ModelState);
+
+            await _mediator.Send(patchSignalRequest);
             return Ok();
         }
     }

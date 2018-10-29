@@ -2,6 +2,9 @@ using System;
 using System.Linq.Expressions;
 using N17Solutions.Semaphore.Responses.Signals;
 using N17Solutions.Semaphore.ServiceContract;
+using N17Solutions.Semaphore.ServiceContract.Extensions;
+using N17Solutions.Semaphore.ServiceContract.Signals;
+using Newtonsoft.Json;
 
 namespace N17Solutions.Semaphore.Domain.Model
 {
@@ -47,6 +50,33 @@ namespace N17Solutions.Semaphore.Domain.Model
         
         /// <inheritdoc cref="ITimestampedEntity.DateLastUpdated" />
         public DateTime DateLastUpdated { get; set; }
+
+        public SignalWriteModel ToWriteModel()
+        {
+            return new SignalWriteModel
+            {
+                Name = Name,
+                Tags = Tags?.Split(','),
+                Encrypted = Tags != null && Tags.Contains(Constants.EncryptedTag),
+                Value = ValueResolver.Resolve(Value, ValueType, IsBaseType)
+            };
+        }
+
+        public void PopulateFromWriteModel(SignalWriteModel writeModel)
+        {
+            var isBaseType = writeModel.Value.IsBaseType();
+            
+            Name = writeModel.Name;
+            Tags = writeModel.Tags.IsNullOrEmpty() ? null : string.Join(",", writeModel.Tags);
+            IsBaseType = isBaseType;
+            ValueType = writeModel.Value.GetSignalValueType();
+            Value = isBaseType ? writeModel.Value.ToString() : JsonConvert.SerializeObject(writeModel.Value);
+        }
+
+        public bool IsEncrypted()
+        {
+            return Tags?.Contains(Constants.EncryptedTag) ?? false;
+        }
     }
     
     public static class SignalExpressions
