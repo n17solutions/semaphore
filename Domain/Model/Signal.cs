@@ -53,11 +53,13 @@ namespace N17Solutions.Semaphore.Domain.Model
 
         public SignalWriteModel ToWriteModel()
         {
+            var isEncrypted = Tags != null && Tags.Contains(Constants.EncryptedTag);
+            
             return new SignalWriteModel
             {
                 Name = Name,
                 Tags = Tags?.Split(','),
-                Encrypted = Tags != null && Tags.Contains(Constants.EncryptedTag),
+                Encrypted = isEncrypted,
                 Value = ValueResolver.Resolve(Value, ValueType, IsBaseType)
             };
         }

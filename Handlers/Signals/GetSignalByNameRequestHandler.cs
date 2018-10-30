@@ -49,9 +49,6 @@ namespace N17Solutions.Semaphore.Handlers.Signals
                 else if (result.IsEncrypted)
                     return result;
                 
-//                var valueType = Type.GetType(result.ValueType);
-//                if (valueType != null)
-//                    result.Value = result.IsBaseType ? Convert.ChangeType(result.Value, valueType) : JsonConvert.DeserializeObject(result.Value.ToString()); 
                 result.Value = ValueResolver.Resolve(result.Value, result.ValueType, result.IsBaseType);
             }
 

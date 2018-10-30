@@ -10,6 +10,7 @@ using N17Solutions.Semaphore.Requests.Security;
 using N17Solutions.Semaphore.Requests.Settings;
 using N17Solutions.Semaphore.Requests.Signals;
 using N17Solutions.Semaphore.ServiceContract;
+using N17Solutions.Semaphore.ServiceContract.Extensions;
 using N17Solutions.Semaphore.ServiceContract.Signals;
 
 namespace N17Solutions.Semaphore.Handlers.Signals
@@ -39,6 +40,14 @@ namespace N17Solutions.Semaphore.Handlers.Signals
                 throw new InvalidOperationException(string.Format(SignalNotFoundMessage, request.Id));
 
             var wasEncrypted = domainModel.IsEncrypted();
+            if (wasEncrypted && !request.PrivateKey.IsNullOrBlank())
+            {
+                domainModel.Value = await _mediator.Send(new DecryptionRequest
+                {
+                    PrivateKey = request.PrivateKey,
+                    ToDecrypt = domainModel.Value
+                }, cancellationToken).ConfigureAwait(false);
+            }
             
             // Because the request needs to be the abstracted SignalWriteModel we have to perform some necessary steps
             // 1) Map the domain model to a write model

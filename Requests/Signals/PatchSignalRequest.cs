@@ -5,7 +5,7 @@ using N17Solutions.Semaphore.ServiceContract.Signals;
 
 namespace N17Solutions.Semaphore.Requests.Signals
 {
-    public class PatchSignalRequest : IRequest
+    public class PatchSignalRequest : GetSignalRequest, IRequest
     {
         /// <summary>
         /// The identifier of the Signal to patch

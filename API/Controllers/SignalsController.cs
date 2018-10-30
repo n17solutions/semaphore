@@ -64,9 +64,21 @@ namespace N17Solutions.Semaphore.API.Controllers
         [Route("{signalId}")]
         public async Task<IActionResult> Patch(Guid signalId, [FromBody] JsonPatchDocument<SignalWriteModel> request)
         {
+            var privateKey = Request.Headers["private-key"];
+            if (!string.IsNullOrEmpty(privateKey))
+            {
+                var publicKey = await _mediator.Send(new GetSettingRequest
+                {
+                    Name = GenerateKeysRequestHandler.PublicKeySettingName
+                });
+                if (publicKey == null)
+                    return StatusCode(500, "No Public Key found.");
+            }
+            
             var patchSignalRequest = new PatchSignalRequest
             {
                 Id = signalId,
+                PrivateKey = privateKey,
                 Patch = request
             };
 
