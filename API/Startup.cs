@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using N17Solutions.Semaphore.Data.Extensions;
+using N17Solutions.Semaphore.Encryption.Extensions;
 using N17Solutions.Semaphore.Handlers.Extensions;
 using N17Solutions.Semaphore.Requests.Extensions;
 
@@ -30,6 +31,7 @@ namespace N17Solutions.Semaphore.API
                 .AddRequests()
                 .AddHandlers()
                 .AddDatabaseContext(databaseConnectionString)
+                .AddEncryption()
                 .AddMvc();
         }
 

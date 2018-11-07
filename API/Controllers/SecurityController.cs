@@ -36,5 +36,26 @@ namespace N17Solutions.Semaphore.API.Controllers
             var result = await _mediator.Send(new GenerateKeysRequest());
             return Ok(result);
         }
+
+        [HttpPost, Route("rollkeys")]
+        public async Task<IActionResult> RollKeys()
+        {
+            var privateKey = Request.Headers["private-key"];
+            if (!string.IsNullOrEmpty(privateKey))
+            {
+                var publicKey = await _mediator.Send(new GetSettingRequest
+                {
+                    Name = GenerateKeysRequestHandler.PublicKeySettingName
+                });
+                if (publicKey == null)
+                    return StatusCode(500, "No Public Key found.");
+            }
+
+            var result = await _mediator.Send(new RollKeysRequest
+            {
+                PrivateKey = privateKey
+            });
+            return Ok(result);
+        }
     }
 }

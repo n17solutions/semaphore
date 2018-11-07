@@ -20,12 +20,10 @@ namespace N17Solutions.Semaphore.Handlers.Security
         public const string PublicKeySettingName = "PublicKey";
 
         private readonly SemaphoreContext _context;
-        private readonly IMediator _mediator;
 
-        public GenerateKeysRequestHandler(SemaphoreContext context, IMediator mediator)
+        public GenerateKeysRequestHandler(SemaphoreContext context)
         {
             _context = context;
-            _mediator = mediator;
         }
 
         public async Task<byte[]> Handle(GenerateKeysRequest request, CancellationToken cancellationToken)
@@ -39,26 +37,31 @@ namespace N17Solutions.Semaphore.Handlers.Security
             var publicKeyInfo = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(keys.Public);
 
             var publicKey = publicKeyInfo.ToAsn1Object().GetDerEncoded();
-            var value = Convert.ToBase64String(publicKey);
+            var publicKeyValue = Convert.ToBase64String(publicKey);
 
-            var setting = await _context.Settings.FirstOrDefaultAsync(s => s.Name.Equals(PublicKeySettingName, StringComparison.InvariantCultureIgnoreCase), cancellationToken).ConfigureAwait(false);
+            await UpdateSetting(PublicKeySettingName, publicKeyValue, cancellationToken).ConfigureAwait(false);
+            await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+            return privateKeyInfo.ToAsn1Object().GetDerEncoded();
+        }
+
+        private async Task UpdateSetting(string settingName, string settingValue, CancellationToken cancellationToken)
+        {
+            var setting = await _context.Settings.FirstOrDefaultAsync(s => s.Name.Equals(settingName, StringComparison.InvariantCultureIgnoreCase), cancellationToken)
+                .ConfigureAwait(false);
             if (setting == null)
             {
                 setting = new Setting
                 {
-                    Name = PublicKeySettingName,
-                    Value = value
+                    Name = settingName,
+                    Value = settingValue
                 };
                 await _context.Settings.AddAsync(setting, cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                setting.Value = value;
+                setting.Value = settingValue;
             }
-
-            await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-            return privateKeyInfo.ToAsn1Object().GetDerEncoded();
         }
     }
 }

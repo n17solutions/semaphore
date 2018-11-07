@@ -6,12 +6,10 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using N17Solutions.Semaphore.Data.Context;
 using N17Solutions.Semaphore.Domain.Model;
-using N17Solutions.Semaphore.Handlers.Extensions;
 using N17Solutions.Semaphore.Requests.Security;
 using N17Solutions.Semaphore.Requests.Signals;
 using N17Solutions.Semaphore.Responses.Signals;
 using N17Solutions.Semaphore.ServiceContract.Signals;
-using Newtonsoft.Json;
 
 // ReSharper disable InvertIf
 

@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Data\Data.csproj" />
+      <ProjectReference Include="..\Encryption\Encryption.csproj" />
       <ProjectReference Include="..\Requests\Requests.csproj" />
       <ProjectReference Include="..\ServiceContract\ServiceContract.csproj" />
     </ItemGroup>
@@ -19,9 +20,6 @@
       </PackageReference>
       <PackageReference Include="Newtonsoft.Json">
         <Version>11.0.2</Version>
-      </PackageReference>
-      <PackageReference Include="Portable.BouncyCastle">
-        <Version>1.8.3</Version>
       </PackageReference>
       <PackageReference Include="RT.Comb">
         <Version>2.3.0</Version>

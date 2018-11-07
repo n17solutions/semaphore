@@ -1,3 +1,10 @@
+#### 1.2 - 07.11.2018
+
+  Encryption
+  
+    * Use Asymmetric Key Exchange
+    * Encrypt data using Symmetric encryption
+
 #### 1.1 - 29.10.2018
 
   Signal Patching

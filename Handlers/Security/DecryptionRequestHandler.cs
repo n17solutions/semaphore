@@ -1,31 +1,29 @@
 using System;
-using System.Security.Cryptography;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using MediatR;
+using N17Solutions.Semaphore.Encryption;
 using N17Solutions.Semaphore.Requests.Security;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Security;
+using Newtonsoft.Json;
 
 namespace N17Solutions.Semaphore.Handlers.Security
 {
-    public class DecryptionRequestHandler : RequestHandler<DecryptionRequest, string>
+    public class DecryptionRequestHandler : IRequestHandler<DecryptionRequest, string>
     {
-        protected override string Handle(DecryptionRequest request)
+        private readonly DataEncrypter _dataEncrypter;
+        
+        public DecryptionRequestHandler(DataEncrypter dataEncrypter)
         {
-            try
-            {
-                var key = (RsaPrivateCrtKeyParameters) PrivateKeyFactory.CreateKey(Convert.FromBase64String(request.PrivateKey));
-                var rsaParameters2 = DotNetUtilities.ToRSAParameters(key);
-                var rsa = new RSACryptoServiceProvider();
-                rsa.ImportParameters(rsaParameters2);
+            _dataEncrypter = dataEncrypter;
+        }
 
-                var dec = rsa.Decrypt(Convert.FromBase64String(request.ToDecrypt), false);
-                return Encoding.UTF8.GetString(dec);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while decrypting the value. This is most likely due to the wrong private key being used. See InnerException for more details.", ex);
-            }
+        public async Task<string> Handle(DecryptionRequest request, CancellationToken cancellationToken)
+        {
+            /*var dataBlock = JsonConvert.DeserializeObject<EncryptedDataBlock>(request.ToDecrypt);
+            var result = await _dataEncrypter.DecryptDataBlock(Convert.FromBase64String(request.PrivateKey), dataBlock);
+            return result;*/
+            var result = _dataEncrypter.OldFashionedDecrypter(request.PrivateKey, request.ToDecrypt);
+            return result;
         }
     }
 }
