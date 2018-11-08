@@ -19,10 +19,8 @@ namespace N17Solutions.Semaphore.Handlers.Security
 
         public async Task<string> Handle(DecryptionRequest request, CancellationToken cancellationToken)
         {
-            /*var dataBlock = JsonConvert.DeserializeObject<EncryptedDataBlock>(request.ToDecrypt);
+            var dataBlock = JsonConvert.DeserializeObject<EncryptedDataBlock>(request.ToDecrypt);
             var result = await _dataEncrypter.DecryptDataBlock(Convert.FromBase64String(request.PrivateKey), dataBlock);
-            return result;*/
-            var result = _dataEncrypter.OldFashionedDecrypter(request.PrivateKey, request.ToDecrypt);
             return result;
         }
     }

@@ -33,24 +33,6 @@ namespace N17Solutions.Semaphore.Encryption
                 dataBlock.EncryptedData).ConfigureAwait(false);
         }
 
-        public string OldFashionedDecrypter(string privateKey, string toDecrypt)
-        {
-            try
-            {
-                var key = (RsaPrivateCrtKeyParameters) PrivateKeyFactory.CreateKey(Convert.FromBase64String(privateKey));
-                var rsaParameters2 = DotNetUtilities.ToRSAParameters(key);
-                var rsa = new RSACryptoServiceProvider();
-                rsa.ImportParameters(rsaParameters2);
-
-                var dec = rsa.Decrypt(Convert.FromBase64String(toDecrypt), false);
-                return Encoding.UTF8.GetString(dec);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while decrypting the value. This is most likely due to the wrong private key being used. See InnerException for more details.", ex);
-            }
-        }
-
         private static void ValidateDigitalSignature(byte[] privateKey, EncryptedDataBlock dataBlock)
         {
             try
