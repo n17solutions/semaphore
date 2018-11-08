@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using N17Solutions.Semaphore.Domain.Model;
 using N17Solutions.Semaphore.ServiceContract;
 using N17Solutions.Semaphore.ServiceContract.Signals;
@@ -155,7 +156,7 @@ namespace N17Solutions.Semaphore.Domain.Tests.Model
             var writeModel = new SignalWriteModel
             {
                 Name = "Test Name",
-                Tags = new[]{"Test", "Tags"},
+                Tags = new List<string>{"Test", "Tags"},
                 Encrypted = false,
                 Value = new SignalWriteModel { Name = "Child" }
             };
@@ -177,7 +178,7 @@ namespace N17Solutions.Semaphore.Domain.Tests.Model
             var writeModel = new SignalWriteModel
             {
                 Name = "Test Name",
-                Tags = new[]{"Test", "Tags"},
+                Tags = new List<string>{"Test", "Tags"},
                 Encrypted = false,
                 Value = "Test Value"
             };

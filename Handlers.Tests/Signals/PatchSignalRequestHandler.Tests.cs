@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -76,7 +77,7 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             {
                 Id = id,
                 Patch = new JsonPatchDocument<SignalWriteModel>()
-                    .Replace(x => x.Tags, new[] {"Tag1", "Tag2"})
+                    .Replace(x => x.Tags, new List<string> {"Tag1", "Tag2"})
                     .Replace(x => x.Value, newValue)
             };
             
@@ -119,7 +120,7 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             {
                 Id = id,
                 Patch = new JsonPatchDocument<SignalWriteModel>()
-                    .Replace(x => x.Tags, new[] {"Tag1", "Tag2"})
+                    .Replace(x => x.Tags, new List<string> {"Tag1", "Tag2"})
                     .Replace(x => x.Value, newValue)
             };
             
@@ -199,7 +200,7 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             {
                 Id = id,
                 Patch = new JsonPatchDocument<SignalWriteModel>()
-                    .Replace(x => x.Tags, new[] {"Tag1", "Tag2"})
+                    .Replace(x => x.Tags, new List<string> {"Tag1", "Tag2"})
                     .Replace(x => x.Value, newValue)
             };
             

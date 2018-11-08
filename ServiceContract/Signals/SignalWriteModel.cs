@@ -18,7 +18,7 @@ namespace N17Solutions.Semaphore.ServiceContract.Signals
         /// <summary>
         /// A collection of tags to add to this signal.
         /// </summary>
-        public IEnumerable<string> Tags { get; set; } = Enumerable.Empty<string>();
+        public List<string> Tags { get; set; } = new List<string>();
 
         /// <summary>
         /// Whether to Encrypt the value

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             var request = new CreateSignalRequest
             {
                 Value = "Test Signal",
-                Tags = new[] {"Test", "Tags"}
+                Tags = new List<string> {"Test", "Tags"}
             };
             
             // Act
@@ -100,7 +101,7 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             var request = new CreateSignalRequest
             {
                 Value = "Test Signal",
-                Tags = new[] {"Test", "Tags"},
+                Tags = new List<string> {"Test", "Tags"},
                 Encrypted = true
             };
             
@@ -141,7 +142,7 @@ namespace N17Solutions.Semaphore.Handlers.Tests.Signals
             var request = new CreateSignalRequest
             {
                 Value = "Test Signal",
-                Tags = new []{"tag"}
+                Tags = new List<string>{"tag"}
             };
             _mediatorMock.Setup(x => x.Send(It.IsAny<GetSignalByNameAndTagRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(signalResponse);
             

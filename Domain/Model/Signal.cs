@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using N17Solutions.Semaphore.Responses.Signals;
 using N17Solutions.Semaphore.ServiceContract;
@@ -58,7 +60,7 @@ namespace N17Solutions.Semaphore.Domain.Model
             return new SignalWriteModel
             {
                 Name = Name,
-                Tags = Tags?.Split(','),
+                Tags = Tags?.Split(',').ToList() ?? new List<string>(),
                 Encrypted = isEncrypted,
                 Value = ValueResolver.Resolve(Value, ValueType, IsBaseType)
             };

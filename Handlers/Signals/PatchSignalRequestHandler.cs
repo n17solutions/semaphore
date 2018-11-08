@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using N17Solutions.Semaphore.Data.Context;
 using N17Solutions.Semaphore.Handlers.Security;
 using N17Solutions.Semaphore.Requests.Security;
@@ -61,28 +64,29 @@ namespace N17Solutions.Semaphore.Handlers.Signals
             
             // 2)
             request.Patch.ApplyTo(writeModel);
-            if ((writeModel.Tags == null || !writeModel.Tags.Contains(Constants.EncryptedTag)) && wasEncrypted)
-                writeModel.Tags = (writeModel.Tags ?? Enumerable.Empty<string>()).Union(new[] {Constants.EncryptedTag}); 
+            if ((writeModel.Tags.IsNullOrEmpty() || !writeModel.Tags.Contains(Constants.EncryptedTag)) && (wasEncrypted || writeModel.Encrypted))
+                writeModel.Tags = (writeModel.Tags ?? Enumerable.Empty<string>()).Union(new[] {Constants.EncryptedTag}).ToList();
             
             // 3)
             domainModel.PopulateFromWriteModel(writeModel);
             
             // 4)
-            if (request.Patch.Operations.Any(operation => operation.path.Equals($"/{nameof(SignalWriteModel.Value)}", StringComparison.InvariantCultureIgnoreCase)))
+            if (request.Patch.Operations.Any(operation => CultureInfo.CurrentCulture.CompareInfo.IndexOf(operation.path, nameof(SignalWriteModel.Value), CompareOptions.OrdinalIgnoreCase) >= 0 ||
+                                                          CultureInfo.CurrentCulture.CompareInfo.IndexOf(operation.path, nameof(SignalWriteModel.Tags), CompareOptions.OrdinalIgnoreCase) >= 0))
             {
-                if (domainModel.IsEncrypted())
+                if (writeModel.Encrypted || (writeModel.Tags ?? new List<string>()).Contains(Constants.EncryptedTag))
                 {
                     var publicKey = await _mediator.Send(new GetSettingRequest
                     {
                         Name = GenerateKeysRequestHandler.PublicKeySettingName
                     }, cancellationToken).ConfigureAwait(false);
-                    
+
                     domainModel.Value = await _mediator.Send(new EncryptionRequest
                     {
                         PublicKey = Convert.FromBase64String(publicKey),
                         ToEncrypt = domainModel.Value
                     }, cancellationToken).ConfigureAwait(false);
-                }   
+                }
             }
             
             // 5)
