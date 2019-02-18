@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -16,10 +16,10 @@
 
     <ItemGroup>
       <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection">
-        <Version>5.1.0</Version>
+        <Version>6.0.1</Version>
       </PackageReference>
       <PackageReference Include="Newtonsoft.Json">
-        <Version>11.0.2</Version>
+        <Version>12.0.1</Version>
       </PackageReference>
       <PackageReference Include="RT.Comb">
         <Version>2.3.0</Version>
